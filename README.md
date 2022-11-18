@@ -2,6 +2,8 @@
 
 ![](https://i.imgur.com/HroclkL.jpg)
 
+
+
 ## Overview
 This repository contains a Flask web application which predicts the fare of flight tickets between the busiest cities in India. This is the deployment part of the capstone project undertaken at [BrainStation](https://brainstation.io/) Data Science Bootcamp. Dataset and the project notebooks can be accessed [here](https://github.com/KasunMalwenna/Flight-Fare-Prediction.git).
 
