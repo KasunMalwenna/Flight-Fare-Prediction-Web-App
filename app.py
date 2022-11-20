@@ -1,5 +1,5 @@
 
-
+# Importing required packages
 from flask import Flask, request, render_template
 from flask_cors import cross_origin
 import sklearn
@@ -7,6 +7,7 @@ import pandas as pd
 import joblib
 
 app = Flask(__name__)
+# load the best model
 model = joblib.load("RanForest_tuned_gridSearch_model_Best.pkl")
 
 
@@ -17,41 +18,52 @@ def home():
     return render_template("home.html")
 
 
-
-
 @app.route("/predict", methods = ["GET", "POST"])
 @cross_origin()
 def predict():
+    """
+      Takes user inputs and creats a list of values for all features in
+      transformed datasent used to train a model and appy .predict on the 
+      traind model and outputs predicted Air fare.
+    
+            Input:  User input from the web app
+                    
+
+            Output: Predicted air fare
+                    
+    """
     if request.method == "POST":
 
-        # Date_of_Journey
+        # grabbing values form user inputs and creating features in dataframe
+        # day month features
         date_dep = request.form["Dep_Time"]
+        
         trip_day = int(pd.to_datetime(date_dep, format="%Y-%m-%dT%H:%M").day)
+        
         trip_month = int(pd.to_datetime(date_dep, format ="%Y-%m-%dT%H:%M").month)
-        # print("Journey Date : ",Journey_day, Journey_month)
-
-        # Departure
+        
+        # deaparture features
         dep_time_hour = int(pd.to_datetime(date_dep, format ="%Y-%m-%dT%H:%M").hour)
+        
         dep_time_minute = int(pd.to_datetime(date_dep, format ="%Y-%m-%dT%H:%M").minute)
-        # print("Departure : ",Dep_hour, Dep_min)
 
-        # Arrival
+        # arrival features
         date_arr = request.form["Arrival_Time"]
+        
         arr_time_hour = int(pd.to_datetime(date_arr, format ="%Y-%m-%dT%H:%M").hour)
+      
         arr_time_minute = int(pd.to_datetime(date_arr, format ="%Y-%m-%dT%H:%M").minute)
-        # print("Arrival : ", Arrival_hour, Arrival_min)
+        
 
-        # Duration
+        # Duration features
         duration_hours = abs(dep_time_hour - arr_time_hour)
         duration_minutes = abs(dep_time_minute - arr_time_minute)
-        # print("Duration : ", dur_hour, dur_min)
 
-        # Total Stops
+        # Stops feature
         stop = int(request.form["stops"])
-        # print(Total_stops)
 
-        # Airline
-        # AIR ASIA = 0 (not in column)
+        # airline feature
+        # airline=='Air Asia'(1 in column)
         airline=request.form['airline']
         if(airline=='Trujet'):
             airline = 0
@@ -86,19 +98,8 @@ def predict():
         else:
             airline = None
 
-        # print(Jet_Airways,
-        #     IndiGo,
-        #     Air_India,
-        #     Multiple_carriers,
-        #     SpiceJet,
-        #     Vistara,
-        #     GoAir,
-        #     Multiple_carriers_Premium_economy,
-        #     Jet_Airways_Business,
-        #     Vistara_Premium_economy,
-        #     Trujet)
 
-        # Source
+        # origin freatures
         # Banglore = 0 (not in column)
         Source = request.form["Source"]
         if (Source == 'Bangalore'):
@@ -157,12 +158,8 @@ def predict():
             Origin_Kolkata = 0
             Origin_Mumbai = 0
 
-        # print(s_Delhi,
-        #     s_Kolkata,
-        #     s_Mumbai,
-        #     s_Chennai)
 
-        # Destination
+        # Destination features
         # Banglore = 0 (not in column)
         Source = request.form["Destination"]
         if (Source == 'Bangalore'):
@@ -221,26 +218,7 @@ def predict():
             Destination_Kolkata = 0
             Destination_Mumbai = 0
 
-        # print(
-        #     d_Cochin,
-        #     d_Delhi,
-        #     d_New_Delhi,
-        #     d_Hyderabad,
-        #     d_Kolkata
-        # )
-        
-
-    #     ['Total_Stops', 'Journey_day', 'Journey_month', 'Dep_hour',
-    #    'Dep_min', 'Arrival_hour', 'Arrival_min', 'Duration_hours',
-    #    'Duration_mins', 'Airline_Air India', 'Airline_GoAir', 'Airline_IndiGo',
-    #    'Airline_Jet Airways', 'Airline_Jet Airways Business',
-    #    'Airline_Multiple carriers',
-    #    'Airline_Multiple carriers Premium economy', 'Airline_SpiceJet',
-    #    'Airline_Trujet', 'Airline_Vistara', 'Airline_Vistara Premium economy',
-    #    'Source_Chennai', 'Source_Delhi', 'Source_Kolkata', 'Source_Mumbai',
-    #    'Destination_Cochin', 'Destination_Delhi', 'Destination_Hyderabad',
-    #    'Destination_Kolkata', 'Destination_New Delhi']
-        
+        # making prediction using created features
         prediction=model.predict([[
             airline,
             stop,
